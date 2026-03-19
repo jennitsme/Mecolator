@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  api:
+    build: .
+    command: sh -c "pnpm install && pnpm dev"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mecolator
+      POSTGRES_PASSWORD: mecolator
+      POSTGRES_DB: mecolator
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

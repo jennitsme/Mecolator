@@ -1,0 +1,19 @@
+{
+  "name": "@mecolator/ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tsup": "8.3.4",
+    "typescript": "5.6.3",
+    "vitest": "2.1.4"
+  }
+}
