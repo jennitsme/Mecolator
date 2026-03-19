@@ -24,9 +24,24 @@ pnpm dev # runs apps/api
 curl http://localhost:3000/health
 ```
 
+### Database (Drizzle + Postgres)
+Schema location: `apps/api/src/schema.ts`
+Config: `apps/api/drizzle.config.mjs`
+
+Generate migrations:
+```bash
+cd apps/api
+pnpm db:generate
+```
+Apply to DB:
+```bash
+cd apps/api
+pnpm db:push
+```
+
 ## Next Steps
 - Implement proper config loader + secrets handling
-- Add DB layer (Drizzle + Postgres) and migrations
-- Add auth (JWT/session) and observability (OpenTelemetry)
+- Expand DB schema (domain tables) and observability (OpenTelemetry)
+- Add auth (JWT/session) and logging pipeline (pino transport)
 - Flesh out AI + web3 packages with concrete clients
 ```
