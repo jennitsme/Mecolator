@@ -1,9 +1,14 @@
 import Fastify from 'fastify';
 import { z } from 'zod';
+import { createDb } from './db.js';
+import { loadEnv } from './env.js';
+
+const env = loadEnv();
+const db = createDb(env.DATABASE_URL);
 
 const app = Fastify({ logger: true });
 
-app.get('/health', async () => ({ status: 'ok' }));
+app.get('/health', async () => ({ status: 'ok', db: true }));
 
 app.post('/echo', async (request, reply) => {
   const schema = z.object({ message: z.string() });
@@ -12,10 +17,11 @@ app.post('/echo', async (request, reply) => {
     reply.code(400);
     return { error: parsed.error.flatten() };
   }
+  await db.healthNote('echo');
   return { message: parsed.data.message };
 });
 
-const port = Number(process.env.PORT || 3000);
+const port = env.PORT;
 
 app
   .listen({ port, host: '0.0.0.0' })
@@ -26,3 +32,11 @@ app
     app.log.error(err);
     process.exit(1);
   });
+
+const shutdown = async () => {
+  await db.pool.end();
+  await app.close();
+};
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

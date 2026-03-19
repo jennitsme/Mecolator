@@ -1,7 +1,14 @@
 import { z } from 'zod';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const envSchema = z.object({
-  PORT: z.string().optional(),
+  PORT: z.coerce.number().default(3000),
+  DATABASE_URL: z
+    .string()
+    .url()
+    .default('postgres://mecolator:mecolator@localhost:5432/mecolator'),
 });
 
 type Env = z.infer<typeof envSchema>;
