@@ -2,11 +2,13 @@ import Fastify from 'fastify';
 import { z } from 'zod';
 import { createDb } from './db.js';
 import { loadEnv } from './env.js';
+import { logger } from './logger.js';
 
 const env = loadEnv();
 const db = createDb(env.DATABASE_URL);
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger });
+await app.register(import('./auth.js'), { databaseUrl: env.DATABASE_URL });
 
 app.get('/health', async () => ({ status: 'ok', db: true }));
 
@@ -19,6 +21,16 @@ app.post('/echo', async (request, reply) => {
   }
   await db.healthNote('echo');
   return { message: parsed.data.message };
+});
+
+app.post('/secure/ping', async (request, reply) => {
+  const apiKey = request.headers['x-api-key'];
+  const ok = await app.verifyApiKey(typeof apiKey === 'string' ? apiKey : undefined);
+  if (!ok) {
+    reply.code(401);
+    return { error: 'unauthorized' };
+  }
+  return { status: 'ok' };
 });
 
 const port = env.PORT;
